@@ -40,6 +40,16 @@ async def read_category_by_query(category: str):
     return books_to_return
 
 
+@app.get("/books/by_author/")
+async def get_books_by_author(author_name: str):
+    books_by_author = [
+        book for book in BOOKS if book["author"].casefold() == author_name.casefold()
+    ]
+    if not books_by_author:
+        return {"error": "No books found by this author"}
+    return books_by_author
+
+
 @app.get("/books/{book_author}/")
 async def read_books_by_author(book_author: str, category: str):
     books_to_return = [

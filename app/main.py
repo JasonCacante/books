@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import Body, FastAPI
 
 app = FastAPI()
 
@@ -51,3 +51,27 @@ async def read_books_by_author(book_author: str, category: str):
     if not books_to_return:
         return {"error": "No books found by this author"}
     return books_to_return
+
+
+@app.post("/books/create_book")
+async def create_book(new_book=Body()):
+    BOOKS.append(new_book)
+    return {"message": "Book added successfully", "book": new_book}
+
+
+@app.put("/books/update_book")
+async def update_book(updated_book=Body()):
+    for index, book in enumerate(BOOKS):
+        if book["title"].casefold() == updated_book["title"].casefold():
+            BOOKS[index] = updated_book
+            return {"message": "Book updated successfully", "book": updated_book}
+    return {"error": "Book not found for update"}
+
+
+@app.delete("/books/delete_book/{book_title}")
+async def delete_book(book_title: str):
+    for index, book in enumerate(BOOKS):
+        if book["title"].casefold() == book_title.casefold():
+            del BOOKS[index]
+            return {"message": "Book deleted successfully"}
+    return {"error": "Book not found for deletion"}

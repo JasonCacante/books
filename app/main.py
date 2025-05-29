@@ -3,17 +3,66 @@ from fastapi import Body, FastAPI
 app = FastAPI()
 
 
+class Book:
+    book_id: int
+    title: str
+    author: str
+    description: str
+    rating: int
+
+    def __init__(self, book_id, title, author, description, rating):
+        self.book_id = book_id
+        self.title = title
+        self.author = author
+        self.description = description
+        self.rating = rating
+
+
 BOOKS = [
-    {"title": "Book One", "author": "Author A", "category": "science"},
-    {"title": "Book Two", "author": "Author B", "category": "fiction"},
-    {"title": "Book Three", "author": "Author C", "category": "history"},
-    {"title": "Book Four", "author": "Author D", "category": "science"},
-    {"title": "Book Five", "author": "Author E", "category": "fiction"},
-    {"title": "Book Six", "author": "Author F", "category": "history"},
-    {"title": "Book Seven", "author": "Author G", "category": "science"},
-    {"title": "Book Eight", "author": "Author H", "category": "fiction"},
-    {"title": "Book Nine", "author": "Author I", "category": "history"},
-    {"title": "Book Ten", "author": "Author J", "category": "science"},
+    Book(1, "1984", "George Orwell", "Dystopian novel set in totalitarian society", 5),
+    Book(
+        2,
+        "To Kill a Mockingbird",
+        "Harper Lee",
+        "Novel about racial injustice in the Deep South",
+        1,
+    ),
+    Book(
+        3,
+        "The Great Gatsby",
+        "F. Scott Fitzgerald",
+        "Story of the mysteriously wealthy Jay Gatsby",
+        4,
+    ),
+    Book(
+        4,
+        "Pride and Prejudice",
+        "Jane Austen",
+        "Romantic novel that critiques the British landed gentry",
+        5,
+    ),
+    Book(
+        5,
+        "Brave New World",
+        "Aldous Huxley",
+        "Dystopian novel about a technologically advanced future",
+        4,
+    ),
+    Book(
+        6,
+        "The Catcher in the Rye",
+        "J.D. Salinger",
+        "Story of teenage angst and alienation",
+        4,
+    ),
+    Book(7, "Fahrenheit 451", "Ray Bradbury", "Dystopian novel about book burning", 5),
+    Book(
+        8,
+        "The Hobbit",
+        "J.R.R. Tolkien",
+        "Fantasy novel about the adventures of Bilbo Baggins",
+        5,
+    ),
 ]
 
 
@@ -22,66 +71,7 @@ async def read_all_books():
     return BOOKS
 
 
-@app.get("/books/{book_title}")
-async def read_book(book_title: str):
-    for book in BOOKS:
-        if book["title"].casefold() == book_title.casefold():
-            return book
-    return {"error": "Book not found"}
-
-
-@app.get("/books/category/")
-async def read_category_by_query(category: str):
-    books_to_return = [
-        book for book in BOOKS if book["category"].casefold() == category.casefold()
-    ]
-    if not books_to_return:
-        return {"error": "No books found in this category"}
-    return books_to_return
-
-
-@app.get("/books/by_author/")
-async def get_books_by_author(author_name: str):
-    books_by_author = [
-        book for book in BOOKS if book["author"].casefold() == author_name.casefold()
-    ]
-    if not books_by_author:
-        return {"error": "No books found by this author"}
-    return books_by_author
-
-
-@app.get("/books/{book_author}/")
-async def read_books_by_author(book_author: str, category: str):
-    books_to_return = [
-        book
-        for book in BOOKS
-        if book["author"].casefold() == book_author.casefold()
-        and book["category"].casefold() == category.casefold()
-    ]
-    if not books_to_return:
-        return {"error": "No books found by this author"}
-    return books_to_return
-
-
-@app.post("/books/create_book")
-async def create_book(new_book=Body()):
-    BOOKS.append(new_book)
-    return {"message": "Book added successfully", "book": new_book}
-
-
-@app.put("/books/update_book")
-async def update_book(updated_book=Body()):
-    for index, book in enumerate(BOOKS):
-        if book["title"].casefold() == updated_book["title"].casefold():
-            BOOKS[index] = updated_book
-            return {"message": "Book updated successfully", "book": updated_book}
-    return {"error": "Book not found for update"}
-
-
-@app.delete("/books/delete_book/{book_title}")
-async def delete_book(book_title: str):
-    for index, book in enumerate(BOOKS):
-        if book["title"].casefold() == book_title.casefold():
-            del BOOKS[index]
-            return {"message": "Book deleted successfully"}
-    return {"error": "Book not found for deletion"}
+@app.post("/create_book")
+async def create_book(book=Body()):
+    BOOKS.append(book)
+    return {"message": "Book created successfully", "book": book}
